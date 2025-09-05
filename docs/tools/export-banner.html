@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Exportar Banner PNG — Código de Vendas</title>
+  <style>
+    :root{color-scheme:dark light}
+    body{margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif; background:#0b0b11; color:#e7e7f2}
+    .wrap{max-width:900px; margin:0 auto; padding:24px}
+    h1{font-size:20px; margin:0 0 12px}
+    .panel{background:#121226; border:1px solid rgba(167,139,250,.25); border-radius:12px; padding:16px; box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .row{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
+    label{font-size:14px; color:#cfcfea}
+    input, select, button{padding:8px 10px; border-radius:8px; border:1px solid rgba(167,139,250,.25); background:#0b0b14; color:#e7e7f2}
+    button{cursor:pointer; background:linear-gradient(135deg,#7c3aed,#8b5cf6); border-color:rgba(167,139,250,.5)}
+    .hint{color:#b9b9d1; font-size:13px; margin-top:8px}
+    .preview{margin-top:16px; display:grid; gap:12px}
+    img{max-width:100%; height:auto; border-radius:10px; border:1px solid rgba(167,139,250,.25)}
+    .warn{color:#fbbf24}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Exportar Banner PNG</h1>
+    <div class="panel">
+      <div class="row">
+        <label for="size">Tamanho:</label>
+        <select id="size">
+          <option value="960x600">960 x 600 (Hero)</option>
+          <option value="1200x630">1200 x 630 (OG social)</option>
+          <option value="1920x1080">1920 x 1080 (Full HD)</option>
+        </select>
+        <button id="export">Baixar banner.png</button>
+      </div>
+      <p class="hint">Este utilitário converte <code>assets/banner-hero.svg</code> em <code>assets/banner.png</code> para uso no site e nas meta tags OG. Se abrir este arquivo diretamente (file://), alguns navegadores podem bloquear a exportação; prefira usar um servidor local (ex.: Live Server) ou a página no GitHub Pages.</p>
+      <p class="hint warn" id="status"></p>
+      <div class="preview">
+        <img id="svg-preview" src="../assets/banner-hero.svg" alt="Prévia do banner SVG"/>
+        <canvas id="cv" style="display:none"></canvas>
+      </div>
+    </div>
+  </div>
+  <script>
+    const $ = (s, r=document) => r.querySelector(s);
+    const btn = $('#export');
+    const sel = $('#size');
+    const cv = $('#cv');
+    const status = $('#status');
+    btn.addEventListener('click', async () => {
+      try{
+        status.textContent = 'Gerando PNG…';
+        const [w, h] = sel.value.split('x').map(Number);
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.src = '../assets/banner-hero.svg';
+        await img.decode();
+        cv.width = w; cv.height = h;
+        const ctx = cv.getContext('2d');
+        // Fundo escuro consistente
+        ctx.fillStyle = '#0f0b1d';
+        ctx.fillRect(0,0,w,h);
+        // Desenha SVG para o tamanho escolhido
+        ctx.drawImage(img, 0, 0, w, h);
+        const blob = await new Promise(res => cv.toBlob(res, 'image/png'));
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'banner.png';
+        document.body.appendChild(a); a.click(); a.remove();
+        URL.revokeObjectURL(url);
+        status.textContent = 'PNG gerado e baixado. Mova o arquivo para /assets/banner.png.';
+      }catch(err){
+        console.error(err);
+        status.textContent = 'Falha ao gerar PNG. Abra via servidor local (ex.: Live Server) ou publique no GitHub Pages para evitar bloqueios do navegador.';
+      }
+    });
+  </script>
+</body>
+</html>
