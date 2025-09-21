@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- Sem gradiente: fundo sólido na cor primária -->
-  <rect width="64" height="64" rx="14" fill="#7c3aed"/>
-  <text x="50%" y="50%" text-anchor="middle" dominant-baseline="central"
-        font-family="Montserrat, Inter, system-ui, -apple-system, Segoe UI, Arial, sans-serif"
-        font-weight="800" font-size="20" fill="#ffffff">CDV</text>
-</svg>
